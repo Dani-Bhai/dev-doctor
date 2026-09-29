@@ -1,23 +1,24 @@
-package main 
-
+package main
 
 import (
-		"context"
-		"github.com/Dani-Bhai/dev-doctor/internal/checks/system"
-		"github.com/Dani-Bhai/dev-doctor/internal/output"
-		"github.com/Dani-Bhai/dev-doctor/internal/runner"
+	"context"
+	"fmt"
+	"os"
+	goruntime "runtime"
+
+	"github.com/Dani-Bhai/dev-doctor/internal/output"
+	"github.com/Dani-Bhai/dev-doctor/internal/runner"
 )
 
 func main() {
-		ctx := context.Background()
+	if goruntime.GOOS != "linux" {
+		fmt.Fprintf(os.Stderr, "devdoctor currently supports Linux only (running on %s)\n", goruntime.GOOS)
+		os.Exit(1)
+	}
 
-		checks := []runner.Check {
-				system.DiskCheck{},
-				system.MemCheck{},
-				system.SwapCheck{},
-		}
+	ctx := context.Background()
 
-		results := runner.Run(ctx, checks)
+	results := runner.Run(ctx, checks())
 
-		output.Print(results)
+	output.Print(results)
 }
