@@ -13,5 +13,6 @@ type Result struct {
 	Group   string
 	Status  Status
 	Message string
+	Summary []string
 	Details []string
 }

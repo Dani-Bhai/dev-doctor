@@ -38,6 +38,10 @@ func detectJavaManagers() []string {
 		managers = append(managers, "jenv")
 	}
 
+	if hasIntelliJ() {
+		managers = append(managers, intellijManager)
+	}
+
 	return managers
 }
 
@@ -95,6 +99,9 @@ func InspectJava(ctx context.Context) JavaInfo {
 
 		case "jenv":
 			versions, err = getJenvJavaVersions(ctx)
+
+		case intellijManager:
+			versions, err = getIntelliJJavaVersions()
 		}
 
 		if err != nil {

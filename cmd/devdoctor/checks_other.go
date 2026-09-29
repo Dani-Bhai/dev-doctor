@@ -4,6 +4,10 @@ package main
 
 import "github.com/Dani-Bhai/dev-doctor/internal/runner"
 
-func checks() []runner.Check {
+func allChecks() []runner.Check {
 	return nil
+}
+
+func findCheck(name string) (runner.Check, bool) {
+	return nil, false
 }

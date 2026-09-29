@@ -1,6 +1,11 @@
 package runtime
 
-import "github.com/Dani-Bhai/dev-doctor/internal/model"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/Dani-Bhai/dev-doctor/internal/model"
+)
 
 type ManagerResult struct {
 	Manager  string
@@ -29,6 +34,7 @@ func runtimeResult(name, tool, activeVersion, activePath string, managers []Mana
 
 	result.Status = model.StatusOk
 	result.Message = activeVersion
+	result.Summary = versionSummary(managers)
 
 	if activePath != "" {
 		result.Details = append(result.Details, "  Path: "+activePath)
@@ -47,4 +53,31 @@ func runtimeResult(name, tool, activeVersion, activePath string, managers []Mana
 	}
 
 	return result
+}
+
+// versionSummary condenses the manager listings into one line, e.g.
+// "  5 versions found (mise, IntelliJ)".
+func versionSummary(managers []ManagerResult) []string {
+	total := 0
+	names := make([]string, 0, len(managers))
+
+	for _, manager := range managers {
+		if len(manager.Versions) == 0 {
+			continue
+		}
+
+		total += len(manager.Versions)
+		names = append(names, manager.Manager)
+	}
+
+	if total == 0 {
+		return nil
+	}
+
+	word := "versions"
+	if total == 1 {
+		word = "version"
+	}
+
+	return []string{fmt.Sprintf("  %d %s found (%s)", total, word, strings.Join(names, ", "))}
 }

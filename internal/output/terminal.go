@@ -6,14 +6,21 @@ import (
 	"github.com/Dani-Bhai/dev-doctor/internal/model"
 )
 
-func Print(results []model.Result) {
+// Print renders the results. Compact mode prints each result's summary,
+// verbose mode prints the full details.
+func Print(results []model.Result, verbose bool) {
 	currentGroup := ""
 
 	for _, result := range results {
+		lines := result.Summary
+		if verbose {
+			lines = result.Details
+		}
+
 		if currentGroup != result.Group {
 			currentGroup = result.Group
 			fmt.Printf("\n%s\n", currentGroup)
-		} else if len(result.Details) > 0 {
+		} else if len(lines) > 0 {
 			fmt.Println()
 		}
 
@@ -33,8 +40,8 @@ func Print(results []model.Result) {
 			result.Message,
 		)
 
-		for _, detail := range result.Details {
-			fmt.Println(detail)
+		for _, line := range lines {
+			fmt.Println(line)
 		}
 	}
 }
