@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build Linux release archives
+        env:
+          GOCACHE: ${{ runner.temp }}/dev-doctor-go-cache
+        run: |
+          set -eu
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build \
+              -trimpath -ldflags='-s -w' \
+              -o dist/devdoctor ./cmd/devdoctor
+            tar -czf "dist/devdoctor_linux_${arch}.tar.gz" -C dist devdoctor
+          done
+          (cd dist && sha256sum devdoctor_linux_*.tar.gz > SHA256SUMS)
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/devdoctor_linux_*.tar.gz
+            dist/SHA256SUMS

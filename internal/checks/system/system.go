@@ -6,11 +6,12 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/Dani-Bhai/dev-doctor/internal/model"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/Dani-Bhai/dev-doctor/internal/model"
 )
 
 type SwapCheck struct{}
@@ -70,21 +71,21 @@ func (MemCheck) Run(ctx context.Context) model.Result {
 	if err != nil {
 		return model.Result{
 			Name:    "Memory",
-			Group:   "Sysem",
+			Group:   "System",
 			Status:  model.StatusError,
 			Message: err.Error(),
 		}
 	}
 
 	totalKb := values["MemTotal"]
-	avaialbleKb := values["MemAvailable"]
+	availableKb := values["MemAvailable"]
 
 	totalGb := float64(totalKb) / 1024 / 1024
-	avaialbleGb := float64(avaialbleKb) / 1024 / 1024
+	availableGb := float64(availableKb) / 1024 / 1024
 
 	status := model.StatusOk
 
-	usagePercentage := 100 - (float64(avaialbleKb)/float64(totalKb))*100
+	usagePercentage := 100 - (float64(availableKb)/float64(totalKb))*100
 
 	if usagePercentage > 90 {
 		status = model.StatusWarning
@@ -97,7 +98,7 @@ func (MemCheck) Run(ctx context.Context) model.Result {
 			Status: status,
 			Message: fmt.Sprintf(
 				"%.1f GB available / %.1f GB (32 gigs of ram is preferred for heavy dev workloads)",
-				avaialbleGb,
+				availableGb,
 				totalGb,
 			),
 		}
@@ -108,8 +109,8 @@ func (MemCheck) Run(ctx context.Context) model.Result {
 		Group:  "System",
 		Status: status,
 		Message: fmt.Sprintf(
-			"%.1f GB avaliable / %.1f GB",
-			avaialbleGb,
+			"%.1f GB available / %.1f GB",
+			availableGb,
 			totalGb,
 		),
 	}

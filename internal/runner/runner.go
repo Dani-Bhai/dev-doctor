@@ -1,32 +1,33 @@
 package runner
 
 import (
-		"context"
-		"sync"
-		"github.com/Dani-Bhai/dev-doctor/internal/model"
+	"context"
+	"sync"
+
+	"github.com/Dani-Bhai/dev-doctor/internal/model"
 )
 
 type Check interface {
-		Name() string 
-		Run(ctx context.Context) model.Result
+	Name() string
+	Run(ctx context.Context) model.Result
 }
 
 func Run(ctx context.Context, checks []Check) []model.Result {
-		results := make([]model.Result, len(checks))
+	results := make([]model.Result, len(checks))
 
-		var wg sync.WaitGroup
+	var wg sync.WaitGroup
 
-		for i, check := range checks {
-				wg.Add(1)
+	for i, check := range checks {
+		wg.Add(1)
 
-				go func(index int, c Check){
-						defer wg.Done()
+		go func(index int, c Check) {
+			defer wg.Done()
 
-						results[index] = c.Run(ctx)
-				}(i, check)
-		}
+			results[index] = c.Run(ctx)
+		}(i, check)
+	}
 
-		wg.Wait()
+	wg.Wait()
 
-		return results
-} 
+	return results
+}
